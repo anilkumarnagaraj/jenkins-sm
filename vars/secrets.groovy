@@ -1,3 +1,5 @@
+#!/usr/bin/env groovy
+
 import groovy.json.JsonSlurperClassic
 
 import java.util.concurrent.Callable
