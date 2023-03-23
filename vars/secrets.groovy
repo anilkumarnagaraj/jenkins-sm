@@ -145,8 +145,8 @@ def withSecret(Map<String, ?> options, Callable<?> fn) {
 }
 
 
-def call(Map<String, ?> options) {
-    echo "test"
+def call(String name = 'human') {
+  echo "Hello, ${name}."
 }
 
 /**
