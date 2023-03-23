@@ -140,11 +140,11 @@ def withSecretSM(
  * @param fn - closure to use
  * @return nothing
  */
-def call(Callable<?> fn) {
+def call() {
    def secrets = [[path: 'poc-api-key-ab', engineVersion: 1, secretValues: [[envVar: "POC_API_KEY", vaultKey: "value"],]]]
     def configuration = [vaultUrl: 'https://f1908db5-13d9-45c0-bd13-06a4224b44bc.us-south.secrets-manager.appdomain.cloud',  vaultCredentialId: 'my-iam-api-key', engineVersion: 1]
  
-    return withSecret(configuration,secrets, fn)
+    return withSecret(configuration,secrets)
 }
 
 /**
@@ -152,8 +152,7 @@ def call(Callable<?> fn) {
  */
 def withSecret(
         def configuration, // Map<String, String>
-        def vaultSecrets, // [[path: ..., secretValues: [[envVar: ..., vaultKey: ...]]]]
-        Callable<?> fn
+        def vaultSecrets // [[path: ..., secretValues: [[envVar: ..., vaultKey: ...]]]]
 ) {
     String serviceUrl = configuration["vaultUrl"]
     if (serviceUrl == "") {
@@ -166,7 +165,7 @@ def withSecret(
     // SOS Vault or SecretsManager
     if (!isSecretsManager) {
         withVault([configuration: configuration, vaultSecrets: vaultSecrets]) {
-            fn()
+            
         }
     } else {
         withSecretSM(configuration, vaultSecrets, fn)
