@@ -140,7 +140,7 @@ def withSecretSM(
  * @param fn - closure to use
  * @return nothing
  */
-def withSecret(Map<String, ?> options, Callable<?> fn) {
+def call(Map<String, ?> options, Callable<?> fn) {
     return withSecret(options["configuration"], options["vaultSecrets"], fn)
 }
 
