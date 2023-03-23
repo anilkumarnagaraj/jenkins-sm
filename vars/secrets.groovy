@@ -8,13 +8,13 @@ def getSmSecret(
         String path,
         List<VaultKeyToEnvVar> keysAndValues
 ) {
-    String expected_name = path.replaceAll("/", "__")
-
+    String expected_name = path
     String listAllResp = "{}"
     withEnv(["SM_EXPECTED_NAME=$expected_name"]) {
         listAllResp = sh(
                 script: '''
                 #!/bin/bash +x
+                set +x
                 curl -X GET --location --header "Authorization: Bearer $SM_TOKEN" \
                     --header "Accept: application/json" \
                     "$SM_URI/api/v1/secrets?search=$SM_EXPECTED_NAME"
@@ -40,6 +40,7 @@ def getSmSecret(
         getResp = sh(
                 script: '''
                 #!/bin/bash +x
+                set +x
                 curl -X GET --location --header "Authorization: Bearer $SM_TOKEN" \
                     --header "Accept: application/json" \
                     "$SM_URI/api/v1/secrets/$SM_SECRET_TYPE/$SM_SECRET_ID"
@@ -47,12 +48,11 @@ def getSmSecret(
                 returnStdout: true
         )
     }
-
     def getRespObj = new JsonSlurperClassic().parseText(getResp)
-    def payload = (getRespObj['resources'][0]['secret_data']['payload'] as Map<String, String>)
+    def payload = getRespObj['resources'][0]['secret_data']['payload']
 
     Map<String, String> secretValues = keysAndValues.collectEntries { entry ->
-        [(entry.envVar): payload[entry.vaultKey]]
+        [(entry.envVar): payload]
     }
 
     return secretValues
@@ -98,8 +98,8 @@ def withSecretSM(
         wrap([$class: "MaskPasswordsBuildWrapper",
               varPasswordPairs: [[password: SM_TOKEN]]]) {
             allSecretValues = secrets.collect {
-                String path = it["path"]
-                String fullPath = (prefixPath + "/" + path).replaceAll("//", "/")
+                String fullPath = it["path"]
+                //String fullPath = (prefixPath + "/" + path).replaceAll("//", "/")
                 def secretValues = (it["secretValues"] as List<Map<String, String>>)
                 def keysAndEnvs = secretValues.collect {
                     return new VaultKeyToEnvVar(it)
@@ -158,7 +158,7 @@ def withSecret(
         throw new RuntimeException("no `serviceUrl` defined for `configuration` in `withSecret`")
     }
 
-    Boolean isSecretsManager = serviceUrl.contains(".vaultSecrets-manager.")
+    Boolean isSecretsManager = serviceUrl.contains("secrets-manager.appdomain.cloud")
 
     // SOS Vault or SecretsManager
     if (!isSecretsManager) {
@@ -167,5 +167,36 @@ def withSecret(
         }
     } else {
         withSecretSM(configuration, vaultSecrets, fn)
+    }
+}
+
+
+def secrets = [
+  [path: 'poc-api-key-ab', engineVersion: 1, secretValues: [
+    [envVar: "POC_API_KEY", vaultKey: "value"],
+	]
+   ]
+]
+
+def configuration = [vaultUrl: 'https://f1908db5-13d9-45c0-bd13-06a4224b44bc.us-south.secrets-manager.appdomain.cloud',  vaultCredentialId: 'my-iam-api-key', engineVersion: 1]
+                      
+pipeline {
+   agent {
+      label 'custom-image-schematics'
+    }
+   
+    stages {
+        stage('Read Secrets from SM') {
+           steps {
+              script{
+                    withSecret([configuration: configuration, vaultSecrets: secrets]) {
+                            sh '''
+                            #!/bin/bash 
+                            ibmcloud login --apikey $POC_API_KEY --no-region
+                            '''
+                    }
+                }
+            }   
+        }
     }
 }
