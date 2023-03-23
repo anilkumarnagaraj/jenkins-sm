@@ -141,10 +141,14 @@ def withSecretSM(
  * @return nothing
  */
 def call() {
+   /*
    def secrets = [[path: 'poc-api-key-ab', engineVersion: 1, secretValues: [[envVar: "POC_API_KEY", vaultKey: "value"],]]]
     def configuration = [vaultUrl: 'https://f1908db5-13d9-45c0-bd13-06a4224b44bc.us-south.secrets-manager.appdomain.cloud',  vaultCredentialId: 'my-iam-api-key', engineVersion: 1]
  
     return withSecret(configuration,secrets)
+    */
+        
+   echo "hello"
 }
 
 /**
