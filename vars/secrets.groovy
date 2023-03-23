@@ -140,12 +140,8 @@ def withSecretSM(
  * @param fn - closure to use
  * @return nothing
  */
-def call() {
-    print "in call method...."
-    def secrets = [[path: 'poc-api-key-ab', engineVersion: 1, secretValues: [[envVar: "POC_API_KEY", vaultKey: "value"],]]]
-    def configuration = [vaultUrl: 'https://f1908db5-13d9-45c0-bd13-06a4224b44bc.us-south.secrets-manager.appdomain.cloud',  vaultCredentialId: 'my-iam-api-key', engineVersion: 1]
- 
-    return withSecret(configuration,secrets)
+def call(Map<String, ?> options, Callable<?> fn) {
+    return withSecret(options["configuration"], options["vaultSecrets"], fn)
 }
 
 /**
