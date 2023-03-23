@@ -144,11 +144,6 @@ def withSecret(Map<String, ?> options, Callable<?> fn) {
     return withSecret(options["configuration"], options["vaultSecrets"], fn)
 }
 
-
-def call(String name = 'human') {
-  echo "Hello, ${name}."
-}
-
 /**
  * Variant with `configuration` and `secretValues` being separate.
  */
