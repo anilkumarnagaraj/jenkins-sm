@@ -15,7 +15,7 @@ def getSmSecret(
                 script: '''
                 #!/bin/bash +x
                 set +x
-                curl -X GET --location --header "Authorization: Bearer $SM_TOKEN" \
+                curl -s -X GET --location --header "Authorization: Bearer $SM_TOKEN" \
                     --header "Accept: application/json" \
                     "$SM_URI/api/v1/secrets?search=$SM_EXPECTED_NAME"
             ''',
@@ -41,7 +41,7 @@ def getSmSecret(
                 script: '''
                 #!/bin/bash +x
                 set +x
-                curl -X GET --location --header "Authorization: Bearer $SM_TOKEN" \
+                curl -s -X GET --location --header "Authorization: Bearer $SM_TOKEN" \
                     --header "Accept: application/json" \
                     "$SM_URI/api/v1/secrets/$SM_SECRET_TYPE/$SM_SECRET_ID"
             ''',
@@ -81,7 +81,7 @@ def withSecretSM(
         String tokenResp = sh(
                 script: '''
                 #!/bin/bash +x
-                curl -X POST "https://iam.cloud.ibm.com/identity/token" \
+                curl -s -X POST "https://iam.cloud.ibm.com/identity/token" \
                   -H "Content-Type: application/x-www-form-urlencoded" \
                   -H "Accept: application/json" \
                   -d "grant_type=urn%3Aibm%3Aparams%3Aoauth%3Agrant-type%3Aapikey&apikey=$SM_API_KEY"
@@ -141,8 +141,6 @@ def withSecretSM(
  * @return nothing
  */
 def call(Map<String, ?> options, Callable<?> fn) {
-    println options["configuration"]
-    println options["vaultSecrets"]
     return withSecret(options["configuration"], options["vaultSecrets"], fn)
 }
 
