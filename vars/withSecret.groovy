@@ -81,6 +81,7 @@ def withSecretSM(
         String tokenResp = sh(
                 script: '''
                 #!/bin/bash +x
+                set +x
                 curl -s -X POST "https://iam.cloud.ibm.com/identity/token" \
                   -H "Content-Type: application/x-www-form-urlencoded" \
                   -H "Accept: application/json" \
