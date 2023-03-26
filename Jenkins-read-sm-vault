@@ -1,3 +1,4 @@
+@Library('jenkins-sm-vault') _
 
 def secrets = [
   [path: 'poc-api-key-ab', engineVersion: 1, secretValues: [
