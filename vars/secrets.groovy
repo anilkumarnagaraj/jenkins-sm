@@ -141,6 +141,8 @@ def withSecretSM(
  * @return nothing
  */
 def withSecret(Map<String, ?> options, Callable<?> fn) {
+    println options["configuration"]
+    println options["vaultSecrets"]
     return withSecret(options["configuration"], options["vaultSecrets"], fn)
 }
 
@@ -149,7 +151,8 @@ def withSecret(Map<String, ?> options, Callable<?> fn) {
  */
 def withSecret(
         def configuration, // Map<String, String>
-        def vaultSecrets // [[path: ..., secretValues: [[envVar: ..., vaultKey: ...]]]]
+        def vaultSecrets, // [[path: ..., secretValues: [[envVar: ..., vaultKey: ...]]]]
+        Callable<?> fn
 ) {
     String serviceUrl = configuration["vaultUrl"]
     if (serviceUrl == "") {
